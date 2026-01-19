@@ -1,0 +1,51 @@
+services:
+  mongodb:
+    image: mongo:7
+    container_name: mlms-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: mlms_secret_2024
+      MONGO_INITDB_DATABASE: smart_mlms
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - mlms-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: mlms-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - mlms-network
+
+  minio:
+    image: minio/minio
+    container_name: mlms-minio
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: mlms_minio
+      MINIO_ROOT_PASSWORD: mlms_minio_secret_2024
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    networks:
+      - mlms-network
+
+volumes:
+  mongodb_data:
+  redis_data:
+  minio_data:
+
+networks:
+  mlms-network:
+    driver: bridge
