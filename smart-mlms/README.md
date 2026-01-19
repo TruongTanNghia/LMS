@@ -1,136 +1,225 @@
-# Smart MLMS - Military Learning Management System
+# 🎖️ Smart MLMS - Hệ thống Đào tạo Quân sự Thông minh
 
-> 🎖️ Hệ thống Đào tạo Quân sự Thông minh với AI Proctoring, Learning Analytics, Trust Score
+> **Military Learning Management System** - Nền tảng học tập và thi cử với AI Proctoring
 
-## 📋 Tổng quan
+[![NestJS](https://img.shields.io/badge/Backend-NestJS-red?logo=nestjs)](https://nestjs.com/)
+[![Next.js](https://img.shields.io/badge/Frontend-Next.js-black?logo=next.js)](https://nextjs.org/)
+[![MongoDB](https://img.shields.io/badge/Database-MongoDB-green?logo=mongodb)](https://mongodb.com/)
+[![TypeScript](https://img.shields.io/badge/Language-TypeScript-blue?logo=typescript)](https://typescriptlang.org/)
 
-Smart MLMS là nền tảng đào tạo thế hệ mới dành cho môi trường quân sự, kết hợp:
-- **LMS Core**: Quản lý khóa học, học liệu, tiến độ học tập
-- **Exam System**: Ngân hàng câu hỏi, sinh đề ngẫu nhiên, chấm tự động
-- **AI Proctoring**: Giám sát thi real-time, phát hiện gian lận
-- **Trust Score**: Hệ thống điểm tín nhiệm cho học viên
+---
 
-## 🏗️ Kiến trúc
+## 📋 Mục lục
 
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Next.js       │    │   NestJS        │    │   FastAPI       │
-│   Frontend      │───▶│   Core API      │───▶│   AI Engine     │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-                              │                       │
-                       ┌──────┴───────────────────────┴──────┐
-                       │              MongoDB                 │
-                       └──────────────────────────────────────┘
-```
+- [Tính năng](#-tính-năng)
+- [Công nghệ](#-công-nghệ)
+- [Cài đặt](#-cài-đặt)
+- [Chạy dự án](#-chạy-dự-án)
+- [Cấu trúc thư mục](#-cấu-trúc-thư-mục)
+- [API Documentation](#-api-documentation)
+- [Tài khoản Demo](#-tài-khoản-demo)
 
-## 🚀 Quick Start
+---
 
-### Prerequisites
+## ✨ Tính năng
+
+### 🔐 Xác thực & Phân quyền
+- JWT Authentication
+- 3 vai trò: **Admin**, **Giảng viên**, **Học viên**
+- Trust Score - Điểm tin cậy của người dùng
+
+### 📚 Quản lý Khóa học
+- CRUD khóa học với chapters/lessons
+- Hỗ trợ nhiều loại bài học: Video, Tài liệu, Slide, Văn bản
+- Theo dõi tiến độ học tập
+
+### 📝 Hệ thống Thi cử
+- Tạo bài thi với nhiều loại câu hỏi (Trắc nghiệm, Đúng/Sai)
+- Chấm điểm tự động
+- Timer và Navigation câu hỏi
+
+### 🎥 AI Proctoring (UI Ready)
+- Camera preview khi thi
+- Phát hiện chuyển tab
+- Ghi nhận vi phạm
+
+### 🏢 Quản lý Đơn vị
+- Cấu trúc cây phân cấp (Học viện → Khoa → Bộ môn)
+- CRUD với parent-child relationship
+
+### 📊 Báo cáo & Thống kê
+- Dashboard tổng quan
+- Charts & Analytics (Recharts)
+- Thống kê vi phạm thi cử
+
+---
+
+## 🛠 Công nghệ
+
+| Layer | Technology |
+|-------|------------|
+| **Frontend** | Next.js 14, React 18, TailwindCSS, Framer Motion |
+| **Backend** | NestJS 10, Mongoose, Passport JWT |
+| **Database** | MongoDB |
+| **State** | Zustand (with persist) |
+| **Validation** | Zod (FE), class-validator (BE) |
+| **Build** | Turborepo |
+
+---
+
+## 📦 Cài đặt
+
+### Yêu cầu
 - Node.js >= 18
-- Docker & Docker Compose
-- Git
+- MongoDB (local hoặc Atlas)
+- npm hoặc pnpm
 
-### 1. Clone & Install
+### Clone & Install
 
 ```bash
-git clone <repo>
-cd smart-mlms
+# Clone repository
+git clone https://github.com/TruongTanNghia/LMS.git
+cd LMS/smart-mlms
+
+# Install dependencies
 npm install
+
+# Install backend dependencies
+cd apps/api && npm install && cd ../..
+
+# Install frontend dependencies
+cd apps/web && npm install && cd ../..
 ```
 
-### 2. Start Infrastructure
+### Cấu hình môi trường
 
 ```bash
-docker-compose up -d
-```
-
-Services:
-- MongoDB: `localhost:27017`
-- Redis: `localhost:6379`
-- MinIO: `localhost:9000` (Console: `localhost:9001`)
-
-### 3. Configure Environment
-
-```bash
+# Copy file .env mẫu
 cp .env.example .env
-# Edit .env với credentials phù hợp
+
+# Chỉnh sửa .env với thông tin của bạn
 ```
 
-### 4. Run Development
+**.env** file:
+```env
+# MongoDB
+MONGODB_URI=mongodb://localhost:27017/smart_mlms
+
+# JWT
+JWT_SECRET=your-super-secret-key-here
+JWT_EXPIRATION=7d
+
+# Port
+API_PORT=3001
+```
+
+### Seed dữ liệu mẫu
+
+```bash
+cd apps/api
+npx ts-node src/seed.ts
+```
+
+---
+
+## 🚀 Chạy dự án
+
+### Development
 
 ```bash
 # Terminal 1 - Backend API
 cd apps/api
-npm install
-npm run dev
+npm run start:dev
+# hoặc
+nest start --watch
 
-# Terminal 2 - Frontend
+# Terminal 2 - Frontend Web
 cd apps/web
-npm install
 npm run dev
 ```
 
-- Frontend: http://localhost:3000
-- API: http://localhost:3001
-- API Docs: http://localhost:3001/api/docs
+### URLs
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:3001
+- **Swagger Docs**: http://localhost:3001/api/docs
 
-## 📁 Cấu trúc Project
+---
+
+## 📁 Cấu trúc thư mục
 
 ```
 smart-mlms/
 ├── apps/
-│   ├── web/                # Next.js Frontend
+│   ├── api/                      # NestJS Backend
 │   │   └── src/
-│   │       ├── app/        # Pages (App Router)
-│   │       └── lib/        # Utilities, API, Store
+│   │       ├── modules/          # Feature modules
+│   │       │   ├── auth/         # Authentication
+│   │       │   ├── users/        # Users CRUD
+│   │       │   ├── units/        # Units hierarchy
+│   │       │   ├── courses/      # Courses management
+│   │       │   ├── exams/        # Exams & proctoring
+│   │       │   └── audit/        # Audit logging
+│   │       ├── schemas/          # Mongoose schemas
+│   │       ├── main.ts           # Entry point
+│   │       └── seed.ts           # Database seeder
 │   │
-│   ├── api/                # NestJS Backend
-│   │   └── src/
-│   │       ├── modules/    # Feature modules
-│   │       └── schemas/    # Mongoose schemas
-│   │
-│   └── ai-engine/          # FastAPI AI (Phase 3)
+│   └── web/                      # Next.js Frontend
+│       └── src/
+│           ├── app/              # App Router pages
+│           │   ├── dashboard/    # Protected pages
+│           │   └── login/        # Public pages
+│           └── lib/              # Utilities
+│               ├── api.ts        # API client (axios)
+│               └── store/        # Zustand stores
 │
-├── docker-compose.yml      # MongoDB, Redis, MinIO
-└── turbo.json             # Monorepo config
+├── docker-compose.yml            # Docker setup
+├── turbo.json                    # Turborepo config
+└── README.md
 ```
 
-## 🔌 API Modules
+---
 
-| Module | Mô tả |
-|--------|-------|
-| **Auth** | JWT authentication, login/register |
-| **Users** | CRUD users, RBAC, trust score |
-| **Units** | Tổ chức đơn vị quân sự (hierarchy) |
-| **Courses** | Khóa học, chapters, lessons, progress |
-| **Exams** | Ngân hàng câu hỏi, bài thi, violations |
-| **Audit** | Ghi log mọi thao tác |
+## 📖 API Documentation
 
-## 👥 Roles
+Swagger UI khả dụng tại: http://localhost:3001/api/docs
 
-| Role | Quyền |
-|------|-------|
-| **ADMIN** | Full access |
-| **TEACHER** | Manage courses, exams, view reports |
-| **STUDENT** | Learn, take exams |
+### Endpoints chính
 
-## 🛡️ Trust Score
+| Method | Endpoint | Mô tả |
+|--------|----------|-------|
+| `POST` | `/api/auth/login` | Đăng nhập |
+| `POST` | `/api/auth/register` | Đăng ký |
+| `GET` | `/api/users` | Danh sách người dùng |
+| `GET` | `/api/units` | Danh sách đơn vị |
+| `GET` | `/api/courses` | Danh sách khóa học |
+| `GET` | `/api/exams` | Danh sách bài thi |
+| `POST` | `/api/exams/:id/start` | Bắt đầu làm bài |
+| `POST` | `/api/exams/attempts/:id/submit` | Nộp bài |
 
-Điểm tín nhiệm học viên (0-100):
-- ✅ Hoàn thành bài học: +2
-- ✅ Đậu bài thi: +5
-- ❌ Tab switch: -2
-- ❌ Face not detected: -3
-- ❌ Phone detected: -5
-- ❌ Multiple faces: -10
+---
 
-## 🔜 Roadmap
+## 👤 Tài khoản Demo
 
-- [x] Phase 1: Foundation (Auth, RBAC, DB, UI)
-- [ ] Phase 2: LMS Core (Full CRUD, Progress tracking)
-- [ ] Phase 3: AI Proctoring (Face detection, violations)
-- [ ] Phase 4: Reports & Polish
+| Vai trò | Email | Mật khẩu |
+|---------|-------|----------|
+| Admin | admin@military.edu.vn | Admin@123 |
+| Giảng viên | teacher@military.edu.vn | Admin@123 |
+| Học viên | student1@military.edu.vn | Admin@123 |
 
-## 📄 License
+---
 
-Proprietary - Military Use Only
+## 📝 License
+
+MIT License - Xem file [LICENSE](LICENSE) để biết thêm chi tiết.
+
+---
+
+## 👨‍💻 Tác giả
+
+**Trương Tấn Nghĩa**
+
+---
+
+<p align="center">
+  Made with ❤️ for Military Education
+</p>
