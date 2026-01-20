@@ -42,6 +42,7 @@ export default function ExamsPage() {
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [editingExam, setEditingExam] = useState<Exam | null>(null);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
     const { user } = useAuthStore();
 
     useEffect(() => {
@@ -71,11 +72,14 @@ export default function ExamsPage() {
 
     const handleDelete = async (id: string) => {
         if (!confirm('Bạn có chắc muốn xóa bài thi này?')) return;
+        setDeletingId(id);
         try {
             await examsApi.delete(id);
             fetchExams();
         } catch (error: any) {
             alert(error.response?.data?.message || 'Xóa thất bại');
+        } finally {
+            setDeletingId(null);
         }
     };
 
@@ -181,10 +185,15 @@ export default function ExamsPage() {
                                                 </button>
                                                 <button
                                                     onClick={() => handleDelete(exam._id)}
-                                                    className="p-2 hover:bg-red-500/20 rounded-lg transition-colors"
+                                                    disabled={deletingId === exam._id}
+                                                    className="p-2 hover:bg-red-500/20 rounded-lg transition-colors disabled:opacity-50"
                                                     title="Xóa"
                                                 >
-                                                    <Trash2 className="w-5 h-5 text-red-400" />
+                                                    {deletingId === exam._id ? (
+                                                        <div className="w-5 h-5 border-2 border-red-400/30 border-t-red-400 rounded-full animate-spin" />
+                                                    ) : (
+                                                        <Trash2 className="w-5 h-5 text-red-400" />
+                                                    )}
                                                 </button>
                                             </>
                                         )}

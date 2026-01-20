@@ -34,6 +34,8 @@ export default function UsersPage() {
     const [showModal, setShowModal] = useState(false);
     const [editingUser, setEditingUser] = useState<User | null>(null);
     const [total, setTotal] = useState(0);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
+    const [togglingId, setTogglingId] = useState<string | null>(null);
 
     useEffect(() => {
         fetchUsers();
@@ -63,20 +65,26 @@ export default function UsersPage() {
 
     const handleDelete = async (id: string) => {
         if (!confirm('Bạn có chắc muốn xóa người dùng này?')) return;
+        setDeletingId(id);
         try {
             await usersApi.delete(id);
             fetchUsers();
         } catch (error: any) {
             alert(error.response?.data?.message || 'Xóa thất bại');
+        } finally {
+            setDeletingId(null);
         }
     };
 
     const handleToggleActive = async (user: User) => {
+        setTogglingId(user._id);
         try {
             await usersApi.update(user._id, { isActive: !user.isActive });
             fetchUsers();
         } catch (error: any) {
             alert(error.response?.data?.message || 'Cập nhật thất bại');
+        } finally {
+            setTogglingId(null);
         }
     };
 
@@ -198,9 +206,12 @@ export default function UsersPage() {
                                         <td className="px-6 py-4">
                                             <button
                                                 onClick={() => handleToggleActive(user)}
-                                                className={`flex items-center gap-1 ${user.isActive ? 'text-green-400' : 'text-red-400'}`}
+                                                disabled={togglingId === user._id}
+                                                className={`flex items-center gap-1.5 px-2 py-1 rounded transition-all ${user.isActive ? 'text-green-400 hover:bg-green-500/10' : 'text-red-400 hover:bg-red-500/10'} disabled:opacity-50`}
                                             >
-                                                {user.isActive ? (
+                                                {togglingId === user._id ? (
+                                                    <div className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" />
+                                                ) : user.isActive ? (
                                                     <><UserCheck className="w-4 h-4" />Hoạt động</>
                                                 ) : (
                                                     <><UserX className="w-4 h-4" />Vô hiệu</>
@@ -217,9 +228,14 @@ export default function UsersPage() {
                                                 </button>
                                                 <button
                                                     onClick={() => handleDelete(user._id)}
-                                                    className="p-2 hover:bg-red-500/20 rounded-lg transition-colors"
+                                                    disabled={deletingId === user._id}
+                                                    className="p-2 hover:bg-red-500/20 rounded-lg transition-colors disabled:opacity-50"
                                                 >
-                                                    <Trash2 className="w-4 h-4 text-red-400" />
+                                                    {deletingId === user._id ? (
+                                                        <div className="w-4 h-4 border-2 border-red-400/30 border-t-red-400 rounded-full animate-spin" />
+                                                    ) : (
+                                                        <Trash2 className="w-4 h-4 text-red-400" />
+                                                    )}
                                                 </button>
                                             </div>
                                         </td>
