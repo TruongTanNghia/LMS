@@ -25,6 +25,8 @@ export default function CoursesPage() {
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [total, setTotal] = useState(0);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
+    const [publishingId, setPublishingId] = useState<string | null>(null);
     const { user } = useAuthStore();
 
     useEffect(() => {
@@ -46,15 +48,19 @@ export default function CoursesPage() {
 
     const handleDelete = async (id: string) => {
         if (!confirm('Bạn có chắc muốn xóa khóa học này?')) return;
+        setDeletingId(id);
         try {
             await coursesApi.delete(id);
             fetchCourses();
         } catch (error: any) {
             alert(error.response?.data?.message || 'Xóa thất bại');
+        } finally {
+            setDeletingId(null);
         }
     };
 
     const handleTogglePublish = async (course: Course) => {
+        setPublishingId(course._id);
         try {
             if (course.isPublished) {
                 await coursesApi.update(course._id, { isPublished: false });
@@ -64,6 +70,8 @@ export default function CoursesPage() {
             fetchCourses();
         } catch (error: any) {
             alert(error.response?.data?.message || 'Cập nhật thất bại');
+        } finally {
+            setPublishingId(null);
         }
     };
 
@@ -145,10 +153,13 @@ export default function CoursesPage() {
                                     <div className="absolute top-3 right-3 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                         <button
                                             onClick={() => handleTogglePublish(course)}
-                                            className="p-2 bg-slate-800/80 rounded-lg hover:bg-slate-700 transition-colors"
+                                            disabled={publishingId === course._id}
+                                            className="p-2 bg-slate-800/80 rounded-lg hover:bg-slate-700 transition-colors disabled:opacity-50"
                                             title={course.isPublished ? 'Ẩn khóa học' : 'Xuất bản'}
                                         >
-                                            {course.isPublished ? (
+                                            {publishingId === course._id ? (
+                                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                            ) : course.isPublished ? (
                                                 <EyeOff className="w-4 h-4 text-yellow-400" />
                                             ) : (
                                                 <Eye className="w-4 h-4 text-green-400" />
@@ -161,9 +172,14 @@ export default function CoursesPage() {
                                         </Link>
                                         <button
                                             onClick={() => handleDelete(course._id)}
-                                            className="p-2 bg-slate-800/80 rounded-lg hover:bg-red-500/50 transition-colors"
+                                            disabled={deletingId === course._id}
+                                            className="p-2 bg-slate-800/80 rounded-lg hover:bg-red-500/50 transition-colors disabled:opacity-50"
                                         >
-                                            <Trash2 className="w-4 h-4 text-red-400" />
+                                            {deletingId === course._id ? (
+                                                <div className="w-4 h-4 border-2 border-red-400/30 border-t-red-400 rounded-full animate-spin" />
+                                            ) : (
+                                                <Trash2 className="w-4 h-4 text-red-400" />
+                                            )}
                                         </button>
                                     </div>
                                 )}

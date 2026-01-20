@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import { Suspense } from 'react';
 import './globals.css';
+import { TopLoader } from '@/components/ui/loading';
 
 const inter = Inter({ subsets: ['latin', 'vietnamese'] });
 
@@ -17,6 +19,9 @@ export default function RootLayout({
     return (
         <html lang="vi" className="dark">
             <body className={inter.className}>
+                <Suspense fallback={null}>
+                    <TopLoader />
+                </Suspense>
                 {children}
             </body>
         </html>

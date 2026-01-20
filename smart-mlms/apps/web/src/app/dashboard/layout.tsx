@@ -3,17 +3,17 @@
 import { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
     LayoutDashboard, Users, Building2, BookOpen, FileQuestion,
-    BarChart3, Settings, LogOut, Shield, Menu, X, ChevronDown
+    BarChart3, Settings, LogOut, Shield, GraduationCap
 } from 'lucide-react';
 import { useAuthStore } from '@/lib/store/auth';
 
 const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Người dùng', href: '/dashboard/users', icon: Users, roles: ['ADMIN'] },
-    { name: 'Đơn vị', href: '/dashboard/units', icon: Building2, roles: ['ADMIN'] },
+    { name: 'Đơn vị Nhà trường', href: '/dashboard/school-units', icon: Building2, roles: ['ADMIN'] },
+    { name: 'Đơn vị Học viên', href: '/dashboard/student-units', icon: GraduationCap, roles: ['ADMIN'] },
     { name: 'Khóa học', href: '/dashboard/courses', icon: BookOpen },
     { name: 'Bài thi', href: '/dashboard/exams', icon: FileQuestion },
     { name: 'Báo cáo', href: '/dashboard/reports', icon: BarChart3, roles: ['ADMIN', 'TEACHER'] },
@@ -39,8 +39,33 @@ export default function DashboardLayout({
     // Show loading while hydrating or no auth
     if (!_hasHydrated || !token || !user) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500"></div>
+            <div className="min-h-screen flex flex-col items-center justify-center bg-dark-100">
+                {/* Logo with RGB border animation */}
+                <div className="relative mb-8">
+                    {/* Animated gradient border */}
+                    <div className="absolute -inset-1 rounded-3xl bg-gradient-to-r from-blue-500 via-purple-500 via-pink-500 via-red-500 via-orange-500 via-yellow-500 via-green-500 to-blue-500 opacity-75 blur-sm animate-gradient-xy" />
+
+                    {/* Inner glow */}
+                    <div className="absolute -inset-0.5 rounded-2xl bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 animate-gradient-x" />
+
+                    {/* Logo container */}
+                    <div className="relative w-24 h-24 bg-dark-100 rounded-2xl flex items-center justify-center">
+                        <div className="w-20 h-20 bg-gradient-to-br from-primary-500 to-military-500 rounded-xl flex items-center justify-center shadow-2xl">
+                            <Shield className="w-10 h-10 text-white" />
+                        </div>
+                    </div>
+                </div>
+
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-primary-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-3">
+                    Smart MLMS
+                </h2>
+
+                {/* Loading bar */}
+                <div className="w-48 h-1 bg-slate-800 rounded-full overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full animate-loading-bar" />
+                </div>
+
+                <p className="text-slate-500 text-sm mt-3">Đang khởi tạo...</p>
             </div>
         );
     }
@@ -117,17 +142,7 @@ export default function DashboardLayout({
 
             {/* Main Content */}
             <main className="flex-1 ml-64 p-8">
-                <AnimatePresence mode="wait">
-                    <motion.div
-                        key={pathname}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        transition={{ duration: 0.2 }}
-                    >
-                        {children}
-                    </motion.div>
-                </AnimatePresence>
+                {children}
             </main>
         </div>
     );

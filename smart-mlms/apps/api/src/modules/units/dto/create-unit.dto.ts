@@ -1,13 +1,14 @@
-import { IsNotEmpty, IsString, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional, IsEnum, IsNumber } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { UnitType, UnitCategory } from '../../../schemas/unit.schema';
 
 export class CreateUnitDto {
-    @ApiProperty({ example: 'Tiểu đoàn 1' })
+    @ApiProperty({ example: 'Khoa Công nghệ Thông tin' })
     @IsString()
     @IsNotEmpty()
     name: string;
 
-    @ApiProperty({ example: 'TD1' })
+    @ApiProperty({ example: 'CNTT' })
     @IsString()
     @IsNotEmpty()
     code: string;
@@ -17,8 +18,23 @@ export class CreateUnitDto {
     @IsString()
     description?: string;
 
+    @ApiPropertyOptional({ enum: UnitType })
+    @IsOptional()
+    @IsEnum(UnitType)
+    type?: UnitType;
+
+    @ApiPropertyOptional({ enum: UnitCategory })
+    @IsOptional()
+    @IsEnum(UnitCategory)
+    category?: UnitCategory;
+
     @ApiPropertyOptional()
     @IsOptional()
     @IsString()
     parentId?: string;
+
+    @ApiPropertyOptional()
+    @IsOptional()
+    @IsNumber()
+    order?: number;
 }
